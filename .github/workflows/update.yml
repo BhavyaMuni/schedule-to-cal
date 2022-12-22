@@ -42,14 +42,14 @@ jobs:
 
       - name: Install project
         run: poetry install --no-interaction
-      - env:
+      - name: Run build
+        run: |
+          source .venv/bin/activate
+          poetry run python3 main.py
+        env:
           METRO-LOGIN: ${{ secrets.METRO_LOGIN }}
           CALENDAR-ID: ${{ secrets.CALENDAR_ID }}
           CLIENT-ID: ${{ secrets.CLIENT_ID }}
           CLIENT-SECRET: ${{ secrets.CLIENT_SECRET }}
           REFRESH-TOKEN: ${{ secrets.REFRESH_TOKEN }}
           TOKEN-URI: ${{ secrets.TOKEN_URI }}
-      - name: Run build
-        run: |
-          source .venv/bin/activate
-          poetry run python3 main.py
