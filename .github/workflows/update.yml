@@ -1,9 +1,11 @@
 name: update-google-calendar
+
 on:
   push:
     branches: [main]
   schedule:
     - cron: "30 17 * * 2"
+
 jobs:
   update-cal:
     runs-on: ubuntu-latest
