@@ -46,7 +46,8 @@ jobs:
         run: poetry install --no-interaction
 
       - name: Run build
-        env: METRO-LOGIN: ${{ secrets.METRO-LOGIN }}
+        env:
+          METRO-LOGIN: ${{ secrets.METRO-LOGIN }}
           CALENDAR-ID: ${{ secrets.CALENDAR-ID }}
           CLIENT-ID: ${{ secrets.CLIENT-ID }}
           CLIENT-SECRET: ${{ secrets.CLIENT-SECRET }}
