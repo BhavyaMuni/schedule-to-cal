@@ -1,7 +1,7 @@
 name: update-google-calendar
 on:
   push:
-    branches: [master]
+    branches: [main]
   schedule:
     - cron: "30 17 * * 2"
 jobs:
