@@ -19,7 +19,7 @@ import aiohttp
 async def get_shifts():
     async with aiohttp.ClientSession() as session:
         url = "https://myschedule.metro.ca/api/"
-        await session.get(f"{url}Login/{os.environ('METRO-LOGIN')}")
+        await session.get(f"{url}Login/{os.getenv('METRO-LOGIN')}")
         async with session.get(f"{url}Employee/") as data:
             return (await data.json())["WorkTime"][-7:]
 
@@ -27,10 +27,10 @@ async def get_shifts():
 def auth():
     creds = Credentials(
         token=None,
-        client_id=os.environ("CLIENT-ID"),
-        client_secret=os.environ("CLIENT-SECRET"),
-        refresh_token=os.environ("REFRESH-TOKEN"),
-        token_uri=os.environ("TOKEN-URI"),
+        client_id=os.getenv("CLIENT-ID"),
+        client_secret=os.getenv("CLIENT-SECRET"),
+        refresh_token=os.getenv("REFRESH-TOKEN"),
+        token_uri=os.getenv("TOKEN-URI"),
     )
     try:
         service = build("calendar", "v3", credentials=creds)
@@ -73,7 +73,7 @@ async def main():
                 event = create_event(s, e)
                 event = (
                     service.events()
-                    .insert(calendarId=os.environ("CALENDAR-ID"), body=event)
+                    .insert(calendarId=os.getenv("CALENDAR-ID"), body=event)
                     .execute()
                 )
                 print("Event created: %s" % (event.get("htmlLink")))
