@@ -8,13 +8,6 @@ jobs:
   update-cal:
     runs-on: ubuntu-latest
     steps:
-      - env:
-          METRO-LOGIN: ${{ secrets.METRO_LOGIN }}
-          CALENDAR-ID: ${{ secrets.CALENDAR_ID }}
-          CLIENT-ID: ${{ secrets.CLIENT_ID }}
-          CLIENT-SECRET: ${{ secrets.CLIENT_SECRET }}
-          REFRESH-TOKEN: ${{ secrets.REFRESH_TOKEN }}
-          TOKEN-URI: ${{ secrets.TOKEN_URI }}
       - uses: actions/checkout@v3
 
       - name: Install Python
@@ -49,7 +42,13 @@ jobs:
 
       - name: Install project
         run: poetry install --no-interaction
-
+      - env:
+          METRO-LOGIN: ${{ secrets.METRO_LOGIN }}
+          CALENDAR-ID: ${{ secrets.CALENDAR_ID }}
+          CLIENT-ID: ${{ secrets.CLIENT_ID }}
+          CLIENT-SECRET: ${{ secrets.CLIENT_SECRET }}
+          REFRESH-TOKEN: ${{ secrets.REFRESH_TOKEN }}
+          TOKEN-URI: ${{ secrets.TOKEN_URI }}
       - name: Run build
         run: |
           source .venv/bin/activate
