@@ -2,7 +2,7 @@ name: update-google-calendar
 
 on:
   schedule:
-    - cron: '5 * * * *'
+    - cron: "47 18 * * *"
 
 jobs:
   update-cal:
