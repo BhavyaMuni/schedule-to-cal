@@ -53,7 +53,6 @@ jobs:
           CLIENT-SECRET: ${{ secrets.CLIENT-SECRET }}
           REFRESH-TOKEN: ${{ secrets.REFRESH-TOKEN }}
           TOKEN-URI: ${{ secrets.TOKEN-URI }}
-
         run: |
           source .venv/bin/activate
           poetry run python3 main.py
