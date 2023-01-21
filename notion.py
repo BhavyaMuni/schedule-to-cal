@@ -1,5 +1,8 @@
 import asyncio
-from pprint import pprint
+import os
+
+import aiohttp
+from dotenv import load_dotenv
 
 # from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
@@ -7,9 +10,6 @@ from google.oauth2.credentials import Credentials
 # from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
-import os
-from dotenv import load_dotenv
-import aiohttp
 
 
 # TODO: CHANGE
@@ -22,17 +22,25 @@ async def get_assignments():
             "Notion-Version": "2022-06-28",
         }
         payload = {
-            "filter": {
-                "property": "assignment",
-                "select": {"is_not_empty": True},
-            },
-            "sorts": [{"property": "date", "direction": "ascending"}],
+            "sorts": [{"property": "Due Date", "direction": "ascending"}],
         }
         async with session.post(
             f"{url}/{os.getenv('NOTION-DATABASE-ID')}/query",
             headers=headers,
             json=payload,
         ) as resp:
+            return await resp.json()
+
+
+async def get_course_names(id):
+    async with aiohttp.ClientSession() as sess:
+        url = "https://api.notion.com/v1/pages"
+        headers = {
+            "Authorization": f"Bearer {os.getenv('NOTION-KEY')}",
+            "Content-Type": "application/json",
+            "Notion-Version": "2022-06-28",
+        }
+        async with sess.get(f"{url}/{id}", headers=headers) as resp:
             return await resp.json()
 
 
@@ -53,53 +61,63 @@ def auth():
 
 
 # TODO: CHANGE
-def create_event(start_time, end_time):
+def create_event(event, course, date):
     return {
-        "summary": "Starbucks",
-        "location": "444 Yonge St, Toronto, ON M5B 2H4",
+        "summary": f"{course} - {event}",
+        # "location": "444 Yonge St, Toronto, ON M5B 2H4",
         "start": {
-            "dateTime": start_time,
+            "date": date,
             "timeZone": "America/New_York",
         },
         "end": {
-            "dateTime": end_time,
+            "date": date,
             "timeZone": "America/New_York",
         },
         "reminders": {"useDefault": True},
     }
 
 
-def get_names_and_dates(obj):
+async def get_names_and_dates(obj):
+    final_out = []
+    courses = set(
+        i["properties"]["Course"]["relation"][0]["id"] for i in obj["results"]
+    )
+    course_names = {}
+    for i in courses:
+        course_names[i] = (await get_course_names(i))["properties"]["Course Code"][
+            "rich_text"
+        ][0]["text"]["content"]
+
     for i in obj["results"]:
-        pprint(
+        final_out.append(
             (
-                i["properties"]["lecture/assignment"]["title"][0]["plain_text"],
-                # i["properties"][],
-                i["properties"]["date"]["date"]["start"],
+                i["properties"]["Assignment"]["title"][0]["plain_text"],
+                course_names[i["properties"]["Course"]["relation"][0]["id"]],
+                i["properties"]["Due Date"]["date"]["start"],
             )
         )
+    return final_out
 
 
 async def main():
     assignments = await get_assignments()
-    get_names_and_dates(assignments)
-    # pprint(assignments)
-    # with auth() as service:
-    #     for i in shifts:
-    #         if i["DailySeconds"] > 0:
-    #             s, e = get_times(i["DailyShift"][0], i["StartDate"])
-    #             event = create_event(s, e)
-    #             event = (
-    #                 service.events()
-    #                 .insert(calendarId=os.getenv("CALENDAR-ID"), body=event)
-    #                 .execute()
-    #             )
-    #             print("Event created: %s" % (event.get("htmlLink")))
+    # course = await get_course_names("8da46137-24ac-4672-bcc0-9322f7e34473")
+    all_assignments = await get_names_and_dates(assignments)
+
+    with auth() as service:
+        for i in all_assignments:
+            event = create_event(i[0], i[1], i[2])
+            event = (
+                service.events()
+                .insert(calendarId=os.getenv("NOTION-CALENDAR-ID"), body=event)
+                .execute()
+            )
+            print("Event created: %s" % (event.get("htmlLink")))
 
 
 if __name__ == "__main__":
     try:
         load_dotenv()
-    except:
+    except Exception as _:
         pass
     asyncio.run(main())
