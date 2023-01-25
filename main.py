@@ -12,11 +12,12 @@ import os
 # from dotenv import load_dotenv
 import aiohttp
 
-# from typing import *
+from typing import List, Optional, Dict, Any
+
 # load_dotenv()
 
 
-async def get_shifts():
+async def get_shifts() -> List:
     async with aiohttp.ClientSession() as session:
         url = "https://myschedule.metro.ca/api/"
         await session.get(f"{url}Login/{os.getenv('METRO-LOGIN')}")
@@ -24,7 +25,7 @@ async def get_shifts():
             return (await data.json())["WorkTime"][-7:]
 
 
-def auth():
+def auth() -> Optional[Any]:
     creds = Credentials(
         token=None,
         client_id=os.getenv("CLIENT-ID"),
@@ -40,7 +41,7 @@ def auth():
     return None
 
 
-def create_event(start_time, end_time):
+def create_event(start_time, end_time) -> Dict:
     return {
         "summary": "Starbucks",
         "location": "444 Yonge St, Toronto, ON M5B 2H4",
@@ -56,7 +57,7 @@ def create_event(start_time, end_time):
     }
 
 
-def get_times(time, date):
+def get_times(time, date) -> tuple[str, str]:
     time_s = time.split("-")[0] + ":00"
     time_e = time.split("-")[1].split(" ")[0] + ":00"
     start_time = date[: -len(time_s)] + time_s
@@ -64,8 +65,8 @@ def get_times(time, date):
     return (start_time, end_time)
 
 
-async def main():
-    shifts = await get_shifts()
+async def main() -> None:
+    shifts: List = await get_shifts()
     with auth() as service:
         for i in shifts:
             if i["DailySeconds"] > 0:
