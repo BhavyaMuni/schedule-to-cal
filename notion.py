@@ -60,11 +60,9 @@ def auth():
     return None
 
 
-# TODO: CHANGE
 def create_event(event, course, date):
     return {
         "summary": f"{course} - {event}",
-        # "location": "444 Yonge St, Toronto, ON M5B 2H4",
         "start": {
             "date": date,
             "timeZone": "America/New_York",

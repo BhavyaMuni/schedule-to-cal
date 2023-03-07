@@ -2,19 +2,19 @@
 import asyncio
 
 # from google.auth.transport.requests import Request
-from google.oauth2.credentials import Credentials
+from google.oauth2.service_account import Credentials
 
 # from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 import os
 
-# from dotenv import load_dotenv
+from dotenv import load_dotenv
 import aiohttp
-
+import json
 from typing import List, Optional, Dict, Any
 
-# load_dotenv()
+load_dotenv()
 
 
 async def get_shifts() -> List:
@@ -26,15 +26,20 @@ async def get_shifts() -> List:
 
 
 def auth() -> Optional[Any]:
-    creds = Credentials(
-        token=None,
-        client_id=os.getenv("CLIENT-ID"),
-        client_secret=os.getenv("CLIENT-SECRET"),
-        refresh_token=os.getenv("REFRESH-TOKEN"),
-        token_uri=os.getenv("TOKEN-URI"),
-    )
+    # creds = Credentials(
+    #     token=None,
+    #     client_id=os.getenv("CLIENT-ID"),
+    #     client_secret=os.getenv("CLIENT-SECRET"),
+    #     refresh_token=os.getenv("REFRESH-TOKEN"),
+    #     token_uri=os.getenv("TOKEN-URI"),
+    # )
+
+    sacc = json.loads(str(os.getenv("SERVICE-ACCOUNT")))
+
+    service_account = Credentials.from_service_account_info(sacc)
+
     try:
-        service = build("calendar", "v3", credentials=creds)
+        service = build("calendar", "v3", credentials=service_account)
         return service
     except HttpError as error:
         print("An error occurred: %s" % error)
