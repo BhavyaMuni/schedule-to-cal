@@ -26,14 +26,6 @@ async def get_shifts() -> List:
 
 
 def auth() -> Optional[Any]:
-    # creds = Credentials(
-    #     token=None,
-    #     client_id=os.getenv("CLIENT-ID"),
-    #     client_secret=os.getenv("CLIENT-SECRET"),
-    #     refresh_token=os.getenv("REFRESH-TOKEN"),
-    #     token_uri=os.getenv("TOKEN-URI"),
-    # )
-
     sacc = json.loads(str(os.getenv("SERVICE-ACCOUNT")))
 
     service_account = Credentials.from_service_account_info(sacc)
