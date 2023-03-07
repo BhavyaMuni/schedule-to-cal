@@ -52,3 +52,4 @@ jobs:
           CLIENT-SECRET: ${{ secrets.CLIENT_SECRET }}
           REFRESH-TOKEN: ${{ secrets.REFRESH_TOKEN }}
           TOKEN-URI: ${{ secrets.TOKEN_URI }}
+          SERVICE-ACCOUNT: ${{ secrets.SERVICE_ACCOUNT }}
