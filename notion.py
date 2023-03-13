@@ -1,11 +1,11 @@
 import asyncio
 import os
-
+import json
 import aiohttp
 from dotenv import load_dotenv
 
 # from google.auth.transport.requests import Request
-from google.oauth2.credentials import Credentials
+from google.oauth2.service_account import Credentials
 
 # from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
@@ -45,15 +45,11 @@ async def get_course_names(id):
 
 
 def auth():
-    creds = Credentials(
-        token=None,
-        client_id=os.getenv("CLIENT-ID"),
-        client_secret=os.getenv("CLIENT-SECRET"),
-        refresh_token=os.getenv("REFRESH-TOKEN"),
-        token_uri=os.getenv("TOKEN-URI"),
-    )
+    sacc = json.loads(str(os.getenv("SERVICE-ACCOUNT")))
+
+    service_account = Credentials.from_service_account_info(sacc)
     try:
-        service = build("calendar", "v3", credentials=creds)
+        service = build("calendar", "v3", credentials=service_account)
         return service
     except HttpError as error:
         print("An error occurred: %s" % error)
